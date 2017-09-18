@@ -178,9 +178,9 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
 }
 
 - (void)registerBHotKey{
-    //注册快捷键cmd+shift+z
+    //注册快捷键cmd+option+z
     RegisterEventHotKey(kVK_ANSI_Z,
-                        cmdKey|shiftKey,
+                        cmdKey|optionKey,
                         b_HotKeyID,
                         GetApplicationEventTarget(),
                         0,
