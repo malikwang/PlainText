@@ -100,7 +100,7 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     //手动清除
     NSMenuItem *manualRemove = [[NSMenuItem alloc] initWithTitle:@"清除剪切板格式" action:@selector(removeFormatter) keyEquivalent:@"z"];
     //添加快捷键
-    [manualRemove setKeyEquivalentModifierMask: NSEventModifierFlagShift | NSEventModifierFlagCommand];
+    [manualRemove setKeyEquivalentModifierMask: NSEventModifierFlagOption | NSEventModifierFlagCommand];
     [_menu addItem:manualRemove];
     
     //自动清除
