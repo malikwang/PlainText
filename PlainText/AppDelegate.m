@@ -26,6 +26,10 @@ static EventHotKeyID a_HotKeyID = {'keyA',1};
 //b_HotKeyID代表手动清除
 static EventHotKeyID b_HotKeyID = {'keyB',2};
 
+//编一个C语言格式的函数，与- (void)removeFormatter一样，为的是myHotKeyHandler调用
+void removeFormatter(){
+    NSLog(@"粘贴");
+}
 //快捷键的回调方法
 OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void *inUserData){
     //判定事件的类型是否与所注册的一致
@@ -40,10 +44,10 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
                           NULL,
                           &keyID);
         if (keyID.id == a_HotKeyID.id) {
-            
+            removeFormatter();
         }
         if (keyID.id == b_HotKeyID.id) {
-            
+            removeFormatter();
         }
     }
     return noErr;
@@ -61,7 +65,7 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     _menu = [[NSMenu alloc] init];
     
     //手动清除
-    NSMenuItem *manualRemove = [[NSMenuItem alloc] initWithTitle:@"清除剪切板格式" action:@selector(removeFormatter) keyEquivalent:@"c"];
+    NSMenuItem *manualRemove = [[NSMenuItem alloc] initWithTitle:@"清除剪切板格式" action:@selector(removeFormatter) keyEquivalent:@"z"];
     //添加快捷键
     [manualRemove setKeyEquivalentModifierMask: NSEventModifierFlagShift | NSEventModifierFlagCommand];
     [_menu addItem:manualRemove];
@@ -70,11 +74,13 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     NSMenuItem *autoRemove = [[NSMenuItem alloc] initWithTitle:@"自动清除" action:@selector(toggleState:) keyEquivalent:@""];
     [_menu addItem:autoRemove];
     
+    [_menu addItem:[NSMenuItem separatorItem]];
     NSMenuItem *quit = [[NSMenuItem alloc] initWithTitle:@"退出" action:@selector(terminate:) keyEquivalent:@"q"];
     [_menu addItem:quit];
     
     [_statusItem setMenu:_menu];
     [self registerHotKeyHandler];
+    [self registerBHotKey];
 }
 
 
@@ -129,8 +135,8 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
 }
 
 - (void)registerBHotKey{
-    //注册快捷键cmd+shift+c
-    RegisterEventHotKey(kVK_ANSI_C,
+    //注册快捷键cmd+shift+z
+    RegisterEventHotKey(kVK_ANSI_Z,
                         cmdKey|shiftKey,
                         b_HotKeyID,
                         GetApplicationEventTarget(),
