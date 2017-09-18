@@ -10,7 +10,9 @@
 #import <Carbon/Carbon.h>
 
 @interface AppDelegate ()
-
+//必须设置为全局变量，否则会一闪而过
+@property (strong, nonatomic) NSStatusItem *statusItem;
+@property (strong, nonatomic) NSMenu *menu;
 @end
 
 //用于保存快捷键事件回调的引用，以便于可以注销
@@ -38,7 +40,7 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
                           NULL,
                           &keyID);
         if (keyID.id == a_HotKeyID.id) {
-            //动作
+            
         }
         if (keyID.id == b_HotKeyID.id) {
             
@@ -51,6 +53,27 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    [_statusItem setHighlightMode:YES];
+    [_statusItem setImage:[NSImage imageNamed:@"itemImage_normal"]];
+    //高亮切换图标
+    [_statusItem setAlternateImage:[NSImage imageNamed:@"itemImage_highlight"]];
+    _menu = [[NSMenu alloc] init];
+    
+    //手动清除
+    NSMenuItem *manualRemove = [[NSMenuItem alloc] initWithTitle:@"清除剪切板格式" action:@selector(removeFormatter) keyEquivalent:@"c"];
+    //添加快捷键
+    [manualRemove setKeyEquivalentModifierMask: NSEventModifierFlagShift | NSEventModifierFlagCommand];
+    [_menu addItem:manualRemove];
+    
+    //自动清除
+    NSMenuItem *autoRemove = [[NSMenuItem alloc] initWithTitle:@"自动清除" action:@selector(toggleState:) keyEquivalent:@""];
+    [_menu addItem:autoRemove];
+    
+    NSMenuItem *quit = [[NSMenuItem alloc] initWithTitle:@"退出" action:@selector(terminate:) keyEquivalent:@"q"];
+    [_menu addItem:quit];
+    
+    [_statusItem setMenu:_menu];
     [self registerHotKeyHandler];
 }
 
@@ -60,6 +83,20 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     [self unregisterAHotKey];
     [self unregisterBHotKey];
     [self unregisterHotKeyHandler];
+}
+
+- (void)removeFormatter{
+    
+}
+
+- (void)toggleState:(NSMenuItem *)item{
+    if (item.state == 0) {
+        item.state = 1;
+        [self registerAHotKey];
+    } else {
+        item.state = 0;
+        [self unregisterAHotKey];
+    }
 }
 
 //当指定cmd+C为热键时，原来的“复制”功能被屏蔽，因此需要重新编写复制函数
@@ -93,7 +130,7 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
 
 - (void)registerBHotKey{
     //注册快捷键cmd+shift+c
-    RegisterEventHotKey(kVK_ANSI_B,
+    RegisterEventHotKey(kVK_ANSI_C,
                         cmdKey|shiftKey,
                         b_HotKeyID,
                         GetApplicationEventTarget(),
