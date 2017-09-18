@@ -28,8 +28,40 @@ static EventHotKeyID b_HotKeyID = {'keyB',2};
 
 //编一个C语言格式的函数，与- (void)removeFormatter一样，为的是myHotKeyHandler调用
 void removeFormatter(){
-    NSLog(@"粘贴");
+    BOOL isText = true;
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    for (NSPasteboardItem *item in pasteboard.pasteboardItems) {
+        for (NSString *type in item.types) {
+            //以后可以不断添加条件
+            if ([type isEqualToString:@"public.file-url"] | [type isEqualToString:@"public.tiff"]) {
+                isText = false;
+                break;
+            }
+        }
+    }
+    if (isText) {
+        NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
+        //写入剪切板
+        [pasteboard clearContents];
+        [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+        [pasteboard setString:plainText forType:NSStringPboardType];
+    } else {
+        NSLog(@"文件");
+    }
 }
+//当指定cmd+C为热键时，原来的“复制”功能被屏蔽，因此需要重新编写复制函数
+void copySelectedText(){
+    //在finder中也能使用
+    CGEventSourceRef src = CGEventSourceCreate(kCGEventSourceStatePrivate);
+    CGEventRef copyEvent = CGEventCreateKeyboardEvent(src, kVK_ANSI_C, true);
+    CGEventSetFlags(copyEvent, kCGEventFlagMaskCommand);
+    //kCGAnnotatedSessionEventTap很重要，不会再触发热键
+    CGEventPost(kCGAnnotatedSessionEventTap, copyEvent);
+    CFRelease(copyEvent);
+    //CGEventPost有延迟
+    sleep(1);
+}
+
 //快捷键的回调方法
 OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void *inUserData){
     //判定事件的类型是否与所注册的一致
@@ -44,6 +76,7 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
                           NULL,
                           &keyID);
         if (keyID.id == a_HotKeyID.id) {
+            copySelectedText();
             removeFormatter();
         }
         if (keyID.id == b_HotKeyID.id) {
@@ -92,7 +125,26 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
 }
 
 - (void)removeFormatter{
-    
+    BOOL isText = true;
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    for (NSPasteboardItem *item in pasteboard.pasteboardItems) {
+        for (NSString *type in item.types) {
+            //以后可以不断添加条件
+            if ([type isEqualToString:@"public.file-url"] | [type isEqualToString:@"public.tiff"]) {
+                isText = false;
+                break;
+            }
+        }
+    }
+    if (isText) {
+        NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
+        //写入剪切板
+        [pasteboard clearContents];
+        [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+        [pasteboard setString:plainText forType:NSStringPboardType];
+    } else {
+        NSLog(@"文件");
+    }
 }
 
 - (void)toggleState:(NSMenuItem *)item{
@@ -103,15 +155,6 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
         item.state = 0;
         [self unregisterAHotKey];
     }
-}
-
-//当指定cmd+C为热键时，原来的“复制”功能被屏蔽，因此需要重新编写复制函数
-- (void)copySelectedText{
-    CGEventRef copyEvent = CGEventCreateKeyboardEvent(NULL, kVK_ANSI_C, true);
-    CGEventSetFlags(copyEvent, kCGEventFlagMaskCommand);
-    //kCGAnnotatedSessionEventTap很重要，不会再触发热键
-    CGEventPost(kCGAnnotatedSessionEventTap, copyEvent);
-    CFRelease(copyEvent);
 }
 
 - (void)registerHotKeyHandler{
