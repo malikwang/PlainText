@@ -32,8 +32,9 @@ void removeFormatter(){
     NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
     for (NSPasteboardItem *item in pasteboard.pasteboardItems) {
         for (NSString *type in item.types) {
-            //以后可以不断添加条件
-            if ([type isEqualToString:@"public.file-url"] | [type isEqualToString:@"public.tiff"]) {
+            NSLog(@"%@",type);
+            //以后可以不断添加条件：文件、图片、word软件内
+            if ([type isEqualToString:@"public.file-url"] | [type isEqualToString:@"public.tiff"] | [type containsString:@"microsoft"]) {
                 isText = false;
                 break;
             }
