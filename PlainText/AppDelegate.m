@@ -21,7 +21,7 @@ static EventHandlerRef g_EventHandlerRef = NULL;
 static EventHotKeyRef a_HotKeyRef = NULL;
 static EventHotKeyRef b_HotKeyRef = NULL;
 //快捷键注册使用的信息，用在回调中判断是哪个快捷键被触发
-//a_HotKeyID代表cmd+C，自动清除
+//a_HotKeyID代表cmd+V，自动清除
 static EventHotKeyID a_HotKeyID = {'keyA',1};
 //b_HotKeyID代表手动清除
 static EventHotKeyID b_HotKeyID = {'keyB',2};
@@ -63,6 +63,19 @@ void copySelectedText(){
     sleep(1);
 }
 
+//当指定cmd+v为热键时，原来的“粘贴”功能被屏蔽，因此需要重新编写
+void pasteText(){
+    //在finder中也能使用
+    CGEventSourceRef src = CGEventSourceCreate(kCGEventSourceStatePrivate);
+    CGEventRef copyEvent = CGEventCreateKeyboardEvent(src, kVK_ANSI_V, true);
+    CGEventSetFlags(copyEvent, kCGEventFlagMaskCommand);
+    //kCGAnnotatedSessionEventTap很重要，不会再触发热键
+    CGEventPost(kCGAnnotatedSessionEventTap, copyEvent);
+    CFRelease(copyEvent);
+    //CGEventPost有延迟
+    sleep(1);
+}
+
 //快捷键的回调方法
 OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void *inUserData){
     //判定事件的类型是否与所注册的一致
@@ -77,8 +90,9 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
                           NULL,
                           &keyID);
         if (keyID.id == a_HotKeyID.id) {
-            copySelectedText();
+//            copySelectedText();
             removeFormatter();
+            pasteText();
         }
         if (keyID.id == b_HotKeyID.id) {
             removeFormatter();
@@ -169,8 +183,8 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
 }
 
 - (void)registerAHotKey{
-    //注册快捷键cmd+c
-    RegisterEventHotKey(kVK_ANSI_C,
+    //注册快捷键cmd+v
+    RegisterEventHotKey(kVK_ANSI_V,
                         cmdKey,
                         a_HotKeyID,
                         GetApplicationEventTarget(),
