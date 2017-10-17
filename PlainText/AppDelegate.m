@@ -27,29 +27,30 @@ static EventHotKeyRef c_HotKeyRef = NULL;
 static EventHotKeyID a_HotKeyID = {'keyA',1};
 //b_HotKeyID代表手动清除
 static EventHotKeyID b_HotKeyID = {'keyB',2};
-//c_HotKeyRef代表英文标题
-//记录是否格式化标题
-static BOOL titleCase = true;
+//c_HotKeyID代表英文标题格式化
+static EventHotKeyID c_HotKeyID = {'keyC',3};
 
-//编一个C语言格式的函数，与- (void)removeFormatter一样，为的是myHotKeyHandler调用
-void removeFormatter(){
-    BOOL isText = true;
+//判断剪切板内是不是纯文本
+bool isText(){
+    BOOL flag = true;
     NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
     for (NSPasteboardItem *item in pasteboard.pasteboardItems) {
         for (NSString *type in item.types) {
             NSLog(@"%@",type);
             //以后可以不断添加条件：文件、图片、word软件内
             if ([type isEqualToString:@"public.file-url"] | [type isEqualToString:@"public.tiff"] | [type containsString:@"microsoft"] | [type containsString:@"png"]) {
-                isText = false;
+                flag = false;
                 break;
             }
         }
     }
-    if (isText) {
+    return flag;
+}
+//编一个C语言格式的函数，与- (void)removeFormatter一样，为的是myHotKeyHandler调用
+void removeFormatter(){
+    if (isText()) {
+        NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
         NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
-        if (titleCase) {
-            plainText = plainText.titlecaseString;
-        }
         //写入剪切板
         [pasteboard clearContents];
         [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
@@ -84,6 +85,20 @@ void pasteText(){
     sleep(1);
 }
 
+void titleCase(){
+    if (isText()) {
+        NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+        NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
+        plainText = plainText.titlecaseString;
+        //写入剪切板
+        [pasteboard clearContents];
+        [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+        [pasteboard setString:plainText forType:NSStringPboardType];
+    } else {
+        NSLog(@"文件");
+    }
+}
+
 //快捷键的回调方法
 OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void *inUserData){
     //判定事件的类型是否与所注册的一致
@@ -98,12 +113,14 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
                           NULL,
                           &keyID);
         if (keyID.id == a_HotKeyID.id) {
-//            copySelectedText();
             removeFormatter();
             pasteText();
         }
         if (keyID.id == b_HotKeyID.id) {
             removeFormatter();
+        }
+        if (keyID.id == c_HotKeyID.id) {
+            titleCase();
         }
     }
     return noErr;
@@ -131,8 +148,9 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     [_menu addItem:autoRemove];
     
     //英文标题格式化
-    _titleCaseItem = [[NSMenuItem alloc] initWithTitle:@"英文标题格式化" action:@selector(titleCase:) keyEquivalent:@""];
-    [_menu addItem:_titleCaseItem];
+    NSMenuItem *titleCase = [[NSMenuItem alloc] initWithTitle:@"英文标题格式化" action:@selector(titleCase) keyEquivalent:@"t"];
+    [titleCase setKeyEquivalentModifierMask: NSEventModifierFlagOption | NSEventModifierFlagCommand];
+    [_menu addItem:titleCase];
     
     [_menu addItem:[NSMenuItem separatorItem]];
     NSMenuItem *quit = [[NSMenuItem alloc] initWithTitle:@"退出" action:@selector(terminate:) keyEquivalent:@"q"];
@@ -141,6 +159,7 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     [_statusItem setMenu:_menu];
     [self registerHotKeyHandler];
     [self registerBHotKey];
+    [self registerCHotKey];
 }
 
 
@@ -148,27 +167,30 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     // Insert code here to tear down your application
     [self unregisterAHotKey];
     [self unregisterBHotKey];
+    [self unregisterCHotKey];
     [self unregisterHotKeyHandler];
 }
 
-- (void)removeFormatter{
-    BOOL isText = true;
+- (BOOL)isText{
+    BOOL flag = true;
     NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
     for (NSPasteboardItem *item in pasteboard.pasteboardItems) {
         for (NSString *type in item.types) {
             NSLog(@"%@",type);
             //以后可以不断添加条件：文件、图片、word软件内
             if ([type isEqualToString:@"public.file-url"] | [type isEqualToString:@"public.tiff"] | [type containsString:@"microsoft"] | [type containsString:@"png"]) {
-                isText = false;
+                flag = false;
                 break;
             }
         }
     }
-    if (isText) {
+    return flag;
+}
+
+- (void)removeFormatter{
+    if ([self isText]) {
+        NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
         NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
-        if (titleCase) {
-            plainText = plainText.titlecaseString;
-        }
         //写入剪切板
         [pasteboard clearContents];
         [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
@@ -178,13 +200,17 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     }
 }
 
-- (void)titleCase:(NSMenuItem *)item{
-    if (item.state == 0) {
-        item.state = 1;
-        titleCase = true;
+- (void)titleCase{
+    if ([self isText]) {
+        NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+        NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
+        plainText = plainText.titlecaseString;
+        //写入剪切板
+        [pasteboard clearContents];
+        [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+        [pasteboard setString:plainText forType:NSStringPboardType];
     } else {
-        item.state = 0;
-        titleCase = false;
+        NSLog(@"文件");
     }
 }
 
@@ -228,6 +254,16 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
                         &b_HotKeyRef);
 }
 
+- (void)registerCHotKey{
+    //注册快捷键cmd+option+t
+    RegisterEventHotKey(kVK_ANSI_T,
+                        cmdKey|optionKey,
+                        c_HotKeyID,
+                        GetApplicationEventTarget(),
+                        0,
+                        &c_HotKeyRef);
+}
+
 - (void)unregisterAHotKey{
     if (a_HotKeyRef){
         UnregisterEventHotKey(a_HotKeyRef);
@@ -239,6 +275,13 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     if (b_HotKeyRef){
         UnregisterEventHotKey(b_HotKeyRef);
         b_HotKeyRef = NULL;
+    }
+}
+
+- (void)unregisterCHotKey{
+    if (c_HotKeyRef){
+        UnregisterEventHotKey(c_HotKeyRef);
+        c_HotKeyRef = NULL;
     }
 }
 
