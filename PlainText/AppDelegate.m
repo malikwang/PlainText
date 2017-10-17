@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import <Carbon/Carbon.h>
+#import "NSString+IATitlecase.h"
 
 @interface AppDelegate ()
 //必须设置为全局变量，否则会一闪而过
@@ -25,6 +26,8 @@ static EventHotKeyRef b_HotKeyRef = NULL;
 static EventHotKeyID a_HotKeyID = {'keyA',1};
 //b_HotKeyID代表手动清除
 static EventHotKeyID b_HotKeyID = {'keyB',2};
+//记录是否格式化标题
+static BOOL titleCase = true;
 
 //编一个C语言格式的函数，与- (void)removeFormatter一样，为的是myHotKeyHandler调用
 void removeFormatter(){
@@ -42,6 +45,9 @@ void removeFormatter(){
     }
     if (isText) {
         NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
+        if (titleCase) {
+            plainText = plainText.titlecaseString;
+        }
         //写入剪切板
         [pasteboard clearContents];
         [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
@@ -122,6 +128,10 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     NSMenuItem *autoRemove = [[NSMenuItem alloc] initWithTitle:@"自动清除" action:@selector(toggleState:) keyEquivalent:@""];
     [_menu addItem:autoRemove];
     
+    //英文标题格式化
+    _titleCaseItem = [[NSMenuItem alloc] initWithTitle:@"英文标题格式化" action:@selector(titleCase:) keyEquivalent:@""];
+    [_menu addItem:_titleCaseItem];
+    
     [_menu addItem:[NSMenuItem separatorItem]];
     NSMenuItem *quit = [[NSMenuItem alloc] initWithTitle:@"退出" action:@selector(terminate:) keyEquivalent:@"q"];
     [_menu addItem:quit];
@@ -154,12 +164,25 @@ OSStatus myHotKeyHandler(EventHandlerCallRef inHandlerCallRef, EventRef inEvent,
     }
     if (isText) {
         NSString *plainText = [[pasteboard readObjectsForClasses:@[[NSString class]] options:nil] firstObject];
+        if (titleCase) {
+            plainText = plainText.titlecaseString;
+        }
         //写入剪切板
         [pasteboard clearContents];
         [pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
         [pasteboard setString:plainText forType:NSStringPboardType];
     } else {
         NSLog(@"文件");
+    }
+}
+
+- (void)titleCase:(NSMenuItem *)item{
+    if (item.state == 0) {
+        item.state = 1;
+        titleCase = true;
+    } else {
+        item.state = 0;
+        titleCase = false;
     }
 }
 
