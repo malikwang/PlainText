@@ -21,11 +21,13 @@ static EventHandlerRef g_EventHandlerRef = NULL;
 //用于保存快捷键注册的引用，便于可以注销该快捷键
 static EventHotKeyRef a_HotKeyRef = NULL;
 static EventHotKeyRef b_HotKeyRef = NULL;
+static EventHotKeyRef c_HotKeyRef = NULL;
 //快捷键注册使用的信息，用在回调中判断是哪个快捷键被触发
 //a_HotKeyID代表cmd+V，自动清除
 static EventHotKeyID a_HotKeyID = {'keyA',1};
 //b_HotKeyID代表手动清除
 static EventHotKeyID b_HotKeyID = {'keyB',2};
+//c_HotKeyRef代表英文标题
 //记录是否格式化标题
 static BOOL titleCase = true;
 

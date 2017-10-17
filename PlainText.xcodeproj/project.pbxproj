@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC5B20581F96357000B34AEE /* NSString+IATitlecase.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5B20511F96356F00B34AEE /* NSString+IATitlecase.m */; };
+		FC5B20591F96357000B34AEE /* Titlecase.regex in Resources */ = {isa = PBXBuildFile; fileRef = FC5B20531F96356F00B34AEE /* Titlecase.regex */; };
+		FC5B205A1F96357000B34AEE /* IARegularExpressionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5B20541F96356F00B34AEE /* IARegularExpressionManager.m */; };
+		FC5B205B1F96357000B34AEE /* IATitlecaseRegularExpressionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5B20571F96357000B34AEE /* IATitlecaseRegularExpressionManager.m */; };
 		FCF3F4201F6EB1A3002F4459 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FCF3F41F1F6EB1A3002F4459 /* AppDelegate.m */; };
 		FCF3F4231F6EB1A3002F4459 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FCF3F4221F6EB1A3002F4459 /* main.m */; };
 		FCF3F4261F6EB1A3002F4459 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCF3F4251F6EB1A3002F4459 /* ViewController.m */; };
@@ -15,6 +19,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FC5B20511F96356F00B34AEE /* NSString+IATitlecase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+IATitlecase.m"; sourceTree = "<group>"; };
+		FC5B20521F96356F00B34AEE /* IATitlecaseRegularExpressionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IATitlecaseRegularExpressionManager.h; sourceTree = "<group>"; };
+		FC5B20531F96356F00B34AEE /* Titlecase.regex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Titlecase.regex; sourceTree = "<group>"; };
+		FC5B20541F96356F00B34AEE /* IARegularExpressionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IARegularExpressionManager.m; sourceTree = "<group>"; };
+		FC5B20551F96356F00B34AEE /* IARegularExpressionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IARegularExpressionManager.h; sourceTree = "<group>"; };
+		FC5B20561F96357000B34AEE /* NSString+IATitlecase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+IATitlecase.h"; sourceTree = "<group>"; };
+		FC5B20571F96357000B34AEE /* IATitlecaseRegularExpressionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IATitlecaseRegularExpressionManager.m; sourceTree = "<group>"; };
 		FCF3F41B1F6EB1A3002F4459 /* PlainText.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlainText.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCF3F41E1F6EB1A3002F4459 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FCF3F41F1F6EB1A3002F4459 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -37,6 +48,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FC5B20501F96353B00B34AEE /* TitleCase */ = {
+			isa = PBXGroup;
+			children = (
+				FC5B20551F96356F00B34AEE /* IARegularExpressionManager.h */,
+				FC5B20541F96356F00B34AEE /* IARegularExpressionManager.m */,
+				FC5B20521F96356F00B34AEE /* IATitlecaseRegularExpressionManager.h */,
+				FC5B20571F96357000B34AEE /* IATitlecaseRegularExpressionManager.m */,
+				FC5B20561F96357000B34AEE /* NSString+IATitlecase.h */,
+				FC5B20511F96356F00B34AEE /* NSString+IATitlecase.m */,
+				FC5B20531F96356F00B34AEE /* Titlecase.regex */,
+			);
+			name = TitleCase;
+			sourceTree = "<group>";
+		};
 		FCF3F4121F6EB1A3002F4459 = {
 			isa = PBXGroup;
 			children = (
@@ -56,6 +81,7 @@
 		FCF3F41D1F6EB1A3002F4459 /* PlainText */ = {
 			isa = PBXGroup;
 			children = (
+				FC5B20501F96353B00B34AEE /* TitleCase */,
 				FCF3F41E1F6EB1A3002F4459 /* AppDelegate.h */,
 				FCF3F41F1F6EB1A3002F4459 /* AppDelegate.m */,
 				FCF3F4241F6EB1A3002F4459 /* ViewController.h */,
@@ -135,6 +161,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC5B20591F96357000B34AEE /* Titlecase.regex in Resources */,
 				FCF3F4281F6EB1A3002F4459 /* Assets.xcassets in Resources */,
 				FCF3F42B1F6EB1A3002F4459 /* Main.storyboard in Resources */,
 			);
@@ -147,9 +174,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC5B20581F96357000B34AEE /* NSString+IATitlecase.m in Sources */,
 				FCF3F4261F6EB1A3002F4459 /* ViewController.m in Sources */,
 				FCF3F4231F6EB1A3002F4459 /* main.m in Sources */,
+				FC5B205B1F96357000B34AEE /* IATitlecaseRegularExpressionManager.m in Sources */,
 				FCF3F4201F6EB1A3002F4459 /* AppDelegate.m in Sources */,
+				FC5B205A1F96357000B34AEE /* IARegularExpressionManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +331,7 @@
 				FCF3F4311F6EB1A3002F4459 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
